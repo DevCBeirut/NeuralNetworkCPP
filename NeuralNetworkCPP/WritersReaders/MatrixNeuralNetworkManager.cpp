@@ -71,7 +71,7 @@ void MatrixNeuralNetworkManager::Read()
     while(!ss.eof())
         ss >> topology[index++];
     
-    *network = new MatrixNeuralNetwork(topology, size - 2, func);
+    *network = new MatrixNeuralNetwork(topology, size, func);
     
     Matrix<Weight> * tw;
     for(int i=0; i<size-1; i++)

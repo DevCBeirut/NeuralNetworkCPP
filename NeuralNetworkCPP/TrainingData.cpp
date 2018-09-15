@@ -19,6 +19,10 @@ void TrainingData::getTopology(std::vector<int> &topology)
     if(this->isEof() || label.compare("topology:") != 0)
         abort();
     
+    int size;
+    ss >> size;
+    ss.get();
+    
     int n;
     while(!ss.eof())
     {

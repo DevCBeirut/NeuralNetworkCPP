@@ -12,15 +12,15 @@ double MatrixNeuralNetwork::eta = 0.15;
 double MatrixNeuralNetwork::alpha = 0.5;
 double MatrixNeuralNetwork::m_recentAverageSmoothingFactor = 100.0;
 
-MatrixNeuralNetwork::MatrixNeuralNetwork(int * _topology, int _hidden_layers, ActivationFunction* _act) : hidden_layers(_hidden_layers+1)
+MatrixNeuralNetwork::MatrixNeuralNetwork(int * _topology, int _topology_size, ActivationFunction* _act) : topology_size(_topology_size)
 {
     this->topology = _topology;
     activationFunc = _act;
-    weights = new Matrix<Weight>*[hidden_layers];
-    neuron_outputs = new Matrix<double>*[hidden_layers+1];
-    gradients = new Matrix<double>*[hidden_layers+1];
+    weights = new Matrix<Weight>*[topology_size-1];
+    neuron_outputs = new Matrix<double>*[topology_size];
+    gradients = new Matrix<double>*[topology_size];
     
-    for(int i=0; i<hidden_layers; i++)
+    for(int i=0; i<topology_size-1; i++)
     {
         weights[i] = new Matrix<Weight>(topology[i]+1, topology[i+1], true);
         neuron_outputs[i] = new Matrix<double>(1, topology[i] + 1);
@@ -28,17 +28,17 @@ MatrixNeuralNetwork::MatrixNeuralNetwork(int * _topology, int _hidden_layers, Ac
         neuron_outputs[i]->getMatrix()[0][neuron_outputs[i]->getColumns() -1] = 1;
     }
     
-    neuron_outputs[hidden_layers] = new Matrix<double>(1, topology[hidden_layers], false);
-    gradients[hidden_layers] = new Matrix<double>(1, topology[hidden_layers], false);
+    neuron_outputs[topology_size-1] = new Matrix<double>(1, topology[topology_size-1], false);
+    gradients[topology_size-1] = new Matrix<double>(1, topology[topology_size-1], false);
 }
 
-MatrixNeuralNetwork::MatrixNeuralNetwork(Matrix<Weight>*** w, int * _topology, int _hidden_layers, ActivationFunction* _act) : hidden_layers(_hidden_layers+1)
+MatrixNeuralNetwork::MatrixNeuralNetwork(Matrix<Weight>*** w, int * _topology, int _topology_size, ActivationFunction* _act) : topology_size(_topology_size)
 {
     this->topology = _topology;
     activationFunc = _act;
-    neuron_outputs = new Matrix<double>*[hidden_layers+1];
-    gradients = new Matrix<double>*[hidden_layers+1];
-    for(int i=0; i<hidden_layers; i++)
+    neuron_outputs = new Matrix<double>*[topology_size];
+    gradients = new Matrix<double>*[topology_size];
+    for(int i=0; i<topology_size-1; i++)
     {
         neuron_outputs[i] = new Matrix<double>(1, topology[i] + 1, false);
         neuron_outputs[i]->getMatrix()[0][neuron_outputs[i]->getColumns() -1] = 1;
@@ -47,19 +47,19 @@ MatrixNeuralNetwork::MatrixNeuralNetwork(Matrix<Weight>*** w, int * _topology, i
     
     this->weights = *w;
     
-    neuron_outputs[hidden_layers] = new Matrix<double>(1, topology[hidden_layers], false);
-    gradients[hidden_layers] = new Matrix<double>(1, topology[hidden_layers], false);
+    neuron_outputs[topology_size-1] = new Matrix<double>(1, topology[topology_size-1], false);
+    gradients[topology_size-1] = new Matrix<double>(1, topology[topology_size-1], false);
 }
 
 MatrixNeuralNetwork::~MatrixNeuralNetwork()
 {
     delete[] topology;
-    for(int i=0; i<hidden_layers; i++)
+    for(int i=0; i<topology_size-1; i++)
     {
         delete weights[i];
         delete neuron_outputs[i];
     }
-    delete neuron_outputs[hidden_layers];
+    delete neuron_outputs[topology_size-1];
     delete[] weights;
     delete[] neuron_outputs;
     delete activationFunc;
@@ -87,19 +87,19 @@ int MatrixNeuralNetwork::getInputSize()
 
 int MatrixNeuralNetwork::getTopologySize()
 {
-    return hidden_layers + 1;
+    return topology_size;
 }
 
 void MatrixNeuralNetwork::getResults(double** outputs)
 {
     *outputs = new double[getResultsSize()];
     for(int i=0; i<getResultsSize(); i++)
-        *outputs[i] = neuron_outputs[hidden_layers]->getMatrix()[0][i];
+        *outputs[i] = neuron_outputs[topology_size-1]->getMatrix()[0][i];
 }
 
 int MatrixNeuralNetwork::getResultsSize()
 {
-    return topology[hidden_layers];
+    return topology[topology_size-1];
 }
 
 void MatrixNeuralNetwork::feedForward(double *inputs)
@@ -110,7 +110,7 @@ void MatrixNeuralNetwork::feedForward(double *inputs)
     Matrix<double> * temp = nullptr;
     
     u_long c_e;
-    for(int i=0; i<hidden_layers; i++)
+    for(int i=0; i<topology_size-1; i++)
     {
         temp = &(*neuron_outputs[i] * *weights[i]);
         c_e = temp->getColumns() + temp->getColumnStart();
@@ -128,21 +128,21 @@ void MatrixNeuralNetwork::backProp(double* targets)
     double _temp;
     double* results = nullptr;
     getResults(&results);
-    for(u_long i=0; i<topology[hidden_layers]; i++)
+    for(u_long i=0; i<topology[topology_size-1]; i++)
     {
         _temp = targets[i] - results[i];
         m_error = _temp * _temp;
     }
-    delete results;
-    m_error = m_error/topology[hidden_layers];
+    delete[] results;
+    m_error = m_error/topology[topology_size-1];
     m_error = std::sqrt(m_error);
     
     m_recentAverageError = (m_recentAverageError * m_recentAverageSmoothingFactor + m_error) / (m_recentAverageSmoothingFactor + 1.0);
     double output_val;
-    for(u_long i=0; i<topology[hidden_layers]; i++)
+    for(u_long i=0; i<topology[topology_size-1]; i++)
     {
-        output_val = neuron_outputs[hidden_layers]->getMatrix()[0][i];
-        gradients[hidden_layers]->getMatrix()[0][i] = (targets[i] - output_val) * activationFunc->transferFunctionDerivative(output_val);
+        output_val = neuron_outputs[topology_size-1]->getMatrix()[0][i];
+        gradients[topology_size-1]->getMatrix()[0][i] = (targets[i] - output_val) * activationFunc->transferFunctionDerivative(output_val);
     }
     
     Matrix<double> * temp;
@@ -151,12 +151,12 @@ void MatrixNeuralNetwork::backProp(double* targets)
     Matrix<double> * gradient;
     
     
-    for(u_long i = hidden_layers; i > 0; i--)
+    for(u_long i = topology_size-1; i > 0; i--)
     {
         wt = &(weights[i-1]->transp());
         gradient = gradients[i];
         
-        if(i != hidden_layers)
+        if(i != topology_size-1)
             gradient = &gradient->Extract(0, gradient->getRows(), 0, gradient->getColumns()-1); //Removing bias;
         
         temp = &(*gradient * *wt);
@@ -175,7 +175,7 @@ void MatrixNeuralNetwork::backProp(double* targets)
     Matrix<Weight> * w_temp;
     u_long e_r;
     u_long e_c;
-    for(int i = hidden_layers - 1; i>=0; --i)
+    for(int i = topology_size-2; i>=0; --i)
     {
         w_temp = weights[i];
         e_r = w_temp->getRowStart() + w_temp->getRows();

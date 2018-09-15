@@ -22,6 +22,14 @@ using namespace std;
 void genTrainingData()
 {
     ofstream out("trainingData.txt");
+    //topology: (the numbers of all layers): (number of neurons in every layer)
+    //topology: 3: 2 4 1 -> will create a neural network with 3 layers :
+    //2 neurons in the input layer, 4 neurons in the hidden layer, 1 neuron in the outout layers
+    //another example :
+    //topology: 5: 3 4 4 3 2 -> will create a neural network ok 5 layers
+    //input layer containing 3 neurons
+    //3 hidden layers containing respectively 4 neurons, 4 neurons, 3 neurons
+    //output layer containing 2 neurons
     out << "topology: 3: 2 4 1" << endl;
     for(int i = 2000; i >= 0; --i)
     {
@@ -67,7 +75,7 @@ void Train()
     
     //NeuralNetwork * myNet = new NeuralNetwork(topology);
     //OR
-    MatrixNeuralNetwork * myNet = new MatrixNeuralNetwork(&topology[0], 1, new TanhActivationFunction());
+    MatrixNeuralNetwork * myNet = new MatrixNeuralNetwork(&topology[0], (int)topology.size(), new TanhActivationFunction());
     vector<double> inputVals, targetVals, resultVals;
     int trainingPass = 0;
     while(!trainData.isEof())
@@ -90,7 +98,7 @@ void Train()
     manager.Write();
 }
 
-#define TEST
+#define TRAIN
  
 
 
@@ -116,6 +124,8 @@ int main(int argc, const char * argv[]) {
     double* output=nullptr;
     n->getResults(&output);
     cout << output[0] <<endl;
+    delete[] input;
+    delete[] output;
     
     
     NeuralNetwork * net = nullptr;

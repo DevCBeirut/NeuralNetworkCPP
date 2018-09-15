@@ -32,6 +32,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0425725B214CDA6D00B68FB9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		0425725C214CDAB700B68FB9 /* tutorial.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = tutorial.md; sourceTree = "<group>"; };
+		0425725D214CE11C00B68FB9 /* Data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Data; sourceTree = "<group>"; };
 		043BE428214B8E6000771759 /* SigmoidActivationFunction.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SigmoidActivationFunction.cpp; sourceTree = "<group>"; };
 		043BE429214B8E6000771759 /* SigmoidActivationFunction.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SigmoidActivationFunction.hpp; sourceTree = "<group>"; };
 		047421F4214C597F00908B32 /* INeuralNetwork.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = INeuralNetwork.hpp; sourceTree = "<group>"; };
@@ -82,8 +85,11 @@
 		0483EA862146D8D300E63894 = {
 			isa = PBXGroup;
 			children = (
+				0425725C214CDAB700B68FB9 /* tutorial.md */,
+				0425725B214CDA6D00B68FB9 /* README.md */,
 				0483EA912146D8D300E63894 /* NeuralNetworkCPP */,
 				0483EA902146D8D300E63894 /* Products */,
+				0425725D214CE11C00B68FB9 /* Data */,
 			);
 			sourceTree = "<group>";
 		};

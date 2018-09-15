@@ -18,7 +18,7 @@ class MatrixNeuralNetwork : public INeuralNetwork {
 private:
     double m_recentAverageError;
     static double m_recentAverageSmoothingFactor;
-    const int hidden_layers;
+    const int topology_size;
     Matrix<Weight> ** weights;
     ActivationFunction * activationFunc;
     Matrix<double> ** neuron_outputs;
